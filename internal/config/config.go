@@ -19,11 +19,11 @@ func NewFromEnv(files ...string) (Config, error) {
 	config := Config{}
 
 	if errLoad := godotenv.Load(files...); errLoad != nil {
-		return Config{}, fmt.Errorf("config: %w", errLoad)
+		return Config{}, fmt.Errorf("could not load configuration: %w", errLoad)
 	}
 
 	if errParse := env.Parse(&config); errParse != nil {
-		return Config{}, fmt.Errorf("config: %w", errParse)
+		return Config{}, fmt.Errorf("could not parse configuration: %w", errParse)
 	}
 
 	return config, nil
