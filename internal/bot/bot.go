@@ -19,7 +19,7 @@ type AgoraBot struct {
 func NewAgoraBot(conf config.Config) (*AgoraBot, error) {
 	dg, errBot := discordgo.New("Bot " + conf.DiscordToken)
 	if errBot != nil {
-		return nil, fmt.Errorf("error creating Discord session: %s", errBot)
+		return nil, fmt.Errorf("error creating Discord session: %w", errBot)
 	}
 
 	return &AgoraBot{
@@ -31,7 +31,7 @@ func NewAgoraBot(conf config.Config) (*AgoraBot, error) {
 func (ab *AgoraBot) Run() error {
 	errOpen := ab.Session.Open()
 	if errOpen != nil {
-		return fmt.Errorf("error opening connection: %s", errOpen)
+		return fmt.Errorf("error opening connection: %w", errOpen)
 	}
 
 	log.Println("Agora Bot running")
