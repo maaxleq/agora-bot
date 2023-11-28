@@ -1,3 +1,4 @@
+// Package config handles the configuration for the AgoraBot.
 package config
 
 import (
@@ -7,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Config holds the configuration variables for the bot.
 type Config struct {
 	MaxHubs           uint   `env:"AGORA_MAX_HUBS" envDefault:"1000"`
 	MaxChannelsPerHub uint   `env:"AGORA_MAX_CHANNELS_PER_HUB" envDefault:"10"`
@@ -15,6 +17,7 @@ type Config struct {
 	DiscordToken      string `env:"DISCORD_TOKEN" envDefault:""`
 }
 
+// NewFromEnv loads the configuration from environment variables or .env files.
 func NewFromEnv(files ...string) (Config, error) {
 	config := Config{}
 

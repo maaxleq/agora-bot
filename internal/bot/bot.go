@@ -1,3 +1,4 @@
+// Package bot defines the structure and functionality of the AgoraBot.
 package bot
 
 import (
@@ -11,11 +12,13 @@ import (
 	"github.com/maaxleq/agora-bot/internal/config"
 )
 
+// AgoraBot represents a Discord bot with configuration and session information.
 type AgoraBot struct {
 	Conf    config.Config
 	Session *discordgo.Session
 }
 
+// NewAgoraBot creates a new instance of AgoraBot with the provided configuration.
 func NewAgoraBot(conf config.Config) (*AgoraBot, error) {
 	dg, errBot := discordgo.New("Bot " + conf.DiscordToken)
 	if errBot != nil {
@@ -28,6 +31,7 @@ func NewAgoraBot(conf config.Config) (*AgoraBot, error) {
 	}, nil
 }
 
+// Run starts the bot, listens for termination signals, and gracefully stops the bot.
 func (ab *AgoraBot) Run() error {
 	errOpen := ab.Session.Open()
 	if errOpen != nil {

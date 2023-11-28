@@ -8,6 +8,7 @@ import (
 	"github.com/maaxleq/agora-bot/internal/config"
 )
 
+// addHandlers adds given handlers to the bot's session.
 func addHandlers(ab *bot.AgoraBot, handlers ...interface{}) {
 	for _, handler := range handlers {
 		ab.Session.AddHandler(handler)
