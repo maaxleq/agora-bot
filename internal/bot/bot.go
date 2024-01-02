@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/maaxleq/agora-bot/internal/config"
@@ -42,6 +43,20 @@ func (ab *AgoraBot) Run() error {
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
+
+	ab.Session.AddHandler(func(s *discordgo.Session, event *discordgo.Disconnect) {
+		log.Println("Connection lost. Reconnecting...")
+		for {
+			errReconnect := ab.Session.Open()
+			if errReconnect == nil {
+				log.Println("Reconnected to Discord API")
+				break
+			}
+			log.Printf("Error reconnecting to Discord API: %v. Retrying in 5 seconds...\n", errReconnect)
+			time.Sleep(5 * time.Second)
+		}
+	})
+
 	<-sc
 
 	ab.Session.Close()
