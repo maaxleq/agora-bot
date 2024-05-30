@@ -1,7 +1,9 @@
 package query
 
-import "github.com/maaxleq/agora-bot/internal/store"
+import (
+	"github.com/maaxleq/agora-bot/internal/bot"
+)
 
 type Query[I interface{}, O interface{}] interface {
-	Do(s store.Storer, params I) (O, error)
+	Do(ab *bot.AgoraBot, params I) (O, error)
 }
