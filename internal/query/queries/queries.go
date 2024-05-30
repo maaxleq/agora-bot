@@ -1,6 +1,8 @@
 package queries
 
 import (
+	"fmt"
+
 	"github.com/maaxleq/agora-bot/internal/bot"
 	"github.com/maaxleq/agora-bot/internal/hub"
 	"github.com/maaxleq/agora-bot/internal/store"
@@ -11,6 +13,15 @@ var empty struct{}
 type AddHubQuery struct{}
 
 func (AddHubQuery) Do(ab *bot.AgoraBot, params store.AddHubParams) (struct{}, error) {
+	hubsCount, errCount := (*ab.Store).GetHubsCount(store.GetHubsCountParams{})
+	if errCount != nil {
+		return empty, errCount
+	}
+
+	if hubsCount >= ab.Conf.MaxHubs {
+		return empty, fmt.Errorf("maximum number of hubs reached")
+	}
+
 	err := (*ab.Store).AddHub(params)
 	return empty, err
 }
@@ -36,6 +47,15 @@ func (GetHubsQuery) Do(ab *bot.AgoraBot, params store.GetHubsParams) ([]hub.Hub,
 type AddChannelQuery struct{}
 
 func (AddChannelQuery) Do(ab *bot.AgoraBot, params store.AddChannelParams) (struct{}, error) {
+	channelsCount, errCount := (*ab.Store).GetChannelsCount(store.GetChannelsCountParams{HubID: params.HubID})
+	if errCount != nil {
+		return empty, errCount
+	}
+
+	if channelsCount >= ab.Conf.MaxChannelsPerHub {
+		return empty, fmt.Errorf("maximum number of channels per hub reached")
+	}
+
 	err := (*ab.Store).AddChannel(store.AddChannelParams{
 		HubID:     params.HubID,
 		ChannelID: params.ChannelID,
@@ -51,12 +71,12 @@ func (DeleteChannelQuery) Do(ab *bot.AgoraBot, params store.DeleteChannelParams)
 
 type GetHubsCountQuery struct{}
 
-func (GetHubsCountQuery) Do(ab *bot.AgoraBot, params store.GetHubsCountParams) (int, error) {
+func (GetHubsCountQuery) Do(ab *bot.AgoraBot, params store.GetHubsCountParams) (uint, error) {
 	return (*ab.Store).GetHubsCount(params)
 }
 
 type GetChannelsCountQuery struct{}
 
-func (GetChannelsCountQuery) Do(ab *bot.AgoraBot, params store.GetChannelsCountParams) (int, error) {
+func (GetChannelsCountQuery) Do(ab *bot.AgoraBot, params store.GetChannelsCountParams) (uint, error) {
 	return (*ab.Store).GetChannelsCount(params)
 }
