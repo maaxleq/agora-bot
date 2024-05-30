@@ -75,14 +75,14 @@ func (m *MemoryStore) DeleteChannel(params store.DeleteChannelParams) (bool, err
 	return false, nil
 }
 
-func (m *MemoryStore) GetHubsCount(params store.GetHubsCountParams) (int, error) {
-	return len(m.hubs), nil
+func (m *MemoryStore) GetHubsCount(params store.GetHubsCountParams) (uint, error) {
+	return uint(len(m.hubs)), nil
 }
 
-func (m *MemoryStore) GetChannelsCount(params store.GetChannelsCountParams) (int, error) {
+func (m *MemoryStore) GetChannelsCount(params store.GetChannelsCountParams) (uint, error) {
 	for _, h := range m.hubs {
 		if h.ID == params.HubID {
-			return len(h.Channels), nil
+			return uint(len(h.Channels)), nil
 		}
 	}
 	return 0, fmt.Errorf("hub %s not found", params.HubID.String())

@@ -45,6 +45,6 @@ type Storer interface {
 	GetHubs(params GetHubsParams) ([]hub.Hub, error)
 	AddChannel(params AddChannelParams) error
 	DeleteChannel(params DeleteChannelParams) (bool, error)
-	GetHubsCount(params GetHubsCountParams) (int, error)
-	GetChannelsCount(params GetChannelsCountParams) (int, error)
+	GetHubsCount(params GetHubsCountParams) (uint, error)
+	GetChannelsCount(params GetChannelsCountParams) (uint, error)
 }
