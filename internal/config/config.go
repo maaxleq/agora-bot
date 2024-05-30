@@ -10,11 +10,16 @@ import (
 
 // Config holds the configuration variables for the bot.
 type Config struct {
+	// AgoraBot configuration
 	MaxHubs           uint   `env:"AGORA_MAX_HUBS" envDefault:"1000"`
 	MaxChannelsPerHub uint   `env:"AGORA_MAX_CHANNELS_PER_HUB" envDefault:"10"`
 	ApiHost           string `env:"AGORA_API_HOST" envDefault:":3000"`
 	ApiKey            string `env:"AGORA_API_KEY" envDefault:"secret"`
-	DiscordToken      string `env:"DISCORD_TOKEN" envDefault:""`
+	DiscordToken      string `env:"AGORA_DISCORD_TOKEN" envDefault:""`
+	StoreType         string `env:"AGORA_STORE_TYPE" envDefault:"memory"`
+
+	// MongoDB configuration
+	MongoURI string `env:"AGORA_MONGO_URI" envDefault:"mongodb://localhost:27017/agora"`
 }
 
 // NewFromEnv loads the configuration from environment variables or .env files.
