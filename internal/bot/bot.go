@@ -11,12 +11,15 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/maaxleq/agora-bot/internal/config"
+	"github.com/maaxleq/agora-bot/internal/store"
+	storeloader "github.com/maaxleq/agora-bot/internal/store/loader"
 )
 
 // AgoraBot represents a Discord bot with configuration and session information.
 type AgoraBot struct {
 	Conf    config.Config
 	Session *discordgo.Session
+	Store   *store.Storer
 }
 
 // NewAgoraBot creates a new instance of AgoraBot with the provided configuration.
@@ -26,9 +29,15 @@ func NewAgoraBot(conf config.Config) (*AgoraBot, error) {
 		return nil, fmt.Errorf("error creating Discord session: %w", errBot)
 	}
 
+	store, errStore := storeloader.LoadStore(conf)
+	if errStore != nil {
+		return nil, fmt.Errorf("error loading store: %w", errStore)
+	}
+
 	return &AgoraBot{
 		Conf:    conf,
 		Session: dg,
+		Store:   store,
 	}, nil
 }
 
