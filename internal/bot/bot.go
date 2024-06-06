@@ -11,6 +11,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/maaxleq/agora-bot/internal/config"
+	"github.com/maaxleq/agora-bot/internal/query"
 	"github.com/maaxleq/agora-bot/internal/store"
 	storeloader "github.com/maaxleq/agora-bot/internal/store/loader"
 )
@@ -39,6 +40,13 @@ func NewAgoraBot(conf config.Config) (*AgoraBot, error) {
 		Session: dg,
 		Store:   store,
 	}, nil
+}
+
+func (ab *AgoraBot) GetQueryDeps() query.QueryDeps {
+	return query.QueryDeps{
+		Store: ab.Store,
+		Conf:  ab.Conf,
+	}
 }
 
 // Run starts the bot, listens for termination signals, and gracefully stops the bot.
