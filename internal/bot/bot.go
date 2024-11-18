@@ -58,6 +58,9 @@ func (ab *AgoraBot) Run() error {
 
 	// Add message handler
 	ab.Session.AddHandler(ab.handleMessage)
+	// Add reaction handlers
+	ab.Session.AddHandler(ab.handleReactionAdd)
+	ab.Session.AddHandler(ab.handleReactionRemove)
 
 	log.Println("Agora Bot running")
 
@@ -120,6 +123,88 @@ func (ab *AgoraBot) handleMessage(s *discordgo.Session, m *discordgo.MessageCrea
 			_, err := s.ChannelMessageSend(targetChannelID, content)
 			if err != nil {
 				log.Printf("Error sending message to channel %s: %v\n", targetChannelID, err)
+			}
+		}
+	}
+}
+
+// handleReactionAdd processes reaction additions and echoes them to other channels in the same hub
+func (ab *AgoraBot) handleReactionAdd(s *discordgo.Session, r *discordgo.MessageReactionAdd) {
+	// Ignore reactions from the bot itself
+	if r.UserID == s.State.User.ID {
+		return
+	}
+
+	// Check if message channel is in any hub
+	h, errHub := (*ab.Store).GetHubOfChannel(store.GetHubOfChannelParams{ChannelID: r.ChannelID})
+	if errHub != nil {
+		log.Printf("Error getting hub of channel: %v\n", errHub)
+		return
+	}
+
+	// Get the user who added the reaction
+	user, err := s.User(r.UserID)
+	if err != nil {
+		log.Printf("Error getting user: %v\n", err)
+		return
+	}
+
+	// Echo reaction to other channels in the hub
+	for _, targetChannelID := range h.Channels {
+		if targetChannelID != r.ChannelID {
+			// Create message about the reaction
+			messageLink := fmt.Sprintf("https://discord.com/channels/%s/%s/%s", r.GuildID, r.ChannelID, r.MessageID)
+			content := fmt.Sprintf("**%s** reacted with %s to [a message](%s) in <#%s>",
+				user.Username,
+				r.Emoji.MessageFormat(),
+				messageLink,
+				r.ChannelID,
+			)
+
+			_, err := s.ChannelMessageSend(targetChannelID, content)
+			if err != nil {
+				log.Printf("Error sending message: %v\n", err)
+			}
+		}
+	}
+}
+
+// handleReactionRemove processes reaction removals and echoes them to other channels in the same hub
+func (ab *AgoraBot) handleReactionRemove(s *discordgo.Session, r *discordgo.MessageReactionRemove) {
+	// Ignore reactions from the bot itself
+	if r.UserID == s.State.User.ID {
+		return
+	}
+
+	// Check if message channel is in any hub
+	h, errHub := (*ab.Store).GetHubOfChannel(store.GetHubOfChannelParams{ChannelID: r.ChannelID})
+	if errHub != nil {
+		log.Printf("Error getting hub of channel: %v\n", errHub)
+		return
+	}
+
+	// Get the user who removed the reaction
+	user, err := s.User(r.UserID)
+	if err != nil {
+		log.Printf("Error getting user: %v\n", err)
+		return
+	}
+
+	// Echo reaction removal to other channels in the hub
+	for _, targetChannelID := range h.Channels {
+		if targetChannelID != r.ChannelID {
+			// Create message about the reaction removal
+			messageLink := fmt.Sprintf("https://discord.com/channels/%s/%s/%s", r.GuildID, r.ChannelID, r.MessageID)
+			content := fmt.Sprintf("**%s** removed their %s reaction from [a message](%s) in <#%s>",
+				user.Username,
+				r.Emoji.MessageFormat(),
+				messageLink,
+				r.ChannelID,
+			)
+
+			_, err := s.ChannelMessageSend(targetChannelID, content)
+			if err != nil {
+				log.Printf("Error sending message: %v\n", err)
 			}
 		}
 	}
