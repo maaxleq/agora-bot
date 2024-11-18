@@ -110,6 +110,13 @@ func (ab *AgoraBot) handleMessage(s *discordgo.Session, m *discordgo.MessageCrea
 				m.Content,
 			)
 
+			// Handle attachments if any
+			if len(m.Attachments) > 0 {
+				for _, attachment := range m.Attachments {
+					content += fmt.Sprintf("\n%s", attachment.URL)
+				}
+			}
+
 			_, err := s.ChannelMessageSend(targetChannelID, content)
 			if err != nil {
 				log.Printf("Error sending message to channel %s: %v\n", targetChannelID, err)
