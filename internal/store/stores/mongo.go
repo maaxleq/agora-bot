@@ -42,6 +42,14 @@ func (m *MongoStore) Configure(config config.Config) error {
 	m.database = client.Database(config.MongoDB)
 	m.collection = m.database.Collection("hubs")
 
+	// Create index on channels array for faster channel lookups
+	_, err = m.collection.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys: bson.D{{Key: "channels", Value: 1}},
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create channels index: %w", err)
+	}
+
 	return nil
 }
 
@@ -175,4 +183,23 @@ func (m *MongoStore) GetChannelsCount(params store.GetChannelsCountParams) (uint
 	}
 
 	return uint(len(hub.Channels)), nil
+}
+
+func (m *MongoStore) GetHubOfChannel(params store.GetHubOfChannelParams) (hub.Hub, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var foundHub hub.Hub
+	err := m.collection.FindOne(ctx, bson.M{
+		"channels": params.ChannelID,
+	}).Decode(&foundHub)
+
+	if err == mongo.ErrNoDocuments {
+		return hub.Hub{}, fmt.Errorf("channel %s not found", params.ChannelID)
+	}
+	if err != nil {
+		return hub.Hub{}, fmt.Errorf("failed to get channel: %w", err)
+	}
+
+	return foundHub, nil
 }

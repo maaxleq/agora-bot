@@ -80,3 +80,9 @@ type GetChannelsCountQuery struct{}
 func (GetChannelsCountQuery) Do(qd query.QueryDeps, params store.GetChannelsCountParams) (uint, error) {
 	return (*qd.Store).GetChannelsCount(params)
 }
+
+type GetHubOfChannelQuery struct{}
+
+func (GetHubOfChannelQuery) Do(qd query.QueryDeps, params store.GetHubOfChannelParams) (hub.Hub, error) {
+	return (*qd.Store).GetHubOfChannel(params)
+}

@@ -87,3 +87,14 @@ func (m *MemoryStore) GetChannelsCount(params store.GetChannelsCountParams) (uin
 	}
 	return 0, fmt.Errorf("hub %s not found", params.HubID.String())
 }
+
+func (m *MemoryStore) GetHubOfChannel(params store.GetHubOfChannelParams) (hub.Hub, error) {
+	for _, h := range m.hubs {
+		for _, c := range h.Channels {
+			if c == params.ChannelID {
+				return h, nil
+			}
+		}
+	}
+	return hub.Hub{}, fmt.Errorf("channel %s not found", params.ChannelID)
+}

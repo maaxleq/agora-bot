@@ -36,6 +36,10 @@ type GetChannelsCountParams struct {
 	HubID primitive.ObjectID
 }
 
+type GetHubOfChannelParams struct {
+	ChannelID string
+}
+
 type Storer interface {
 	Configure(config config.Config) error
 
@@ -47,4 +51,5 @@ type Storer interface {
 	DeleteChannel(params DeleteChannelParams) (bool, error)
 	GetHubsCount(params GetHubsCountParams) (uint, error)
 	GetChannelsCount(params GetChannelsCountParams) (uint, error)
+	GetHubOfChannel(params GetHubOfChannelParams) (hub.Hub, error)
 }

@@ -56,6 +56,9 @@ func (ab *AgoraBot) Run() error {
 		return fmt.Errorf("error opening connection: %w", errOpen)
 	}
 
+	// Add message handler
+	ab.Session.AddHandler(ab.handleMessage)
+
 	log.Println("Agora Bot running")
 
 	sc := make(chan os.Signal, 1)
@@ -81,4 +84,36 @@ func (ab *AgoraBot) Run() error {
 	log.Println("Agora Bot stopped")
 
 	return nil
+}
+
+// handleMessage processes incoming messages and echoes them to other channels in the same hub
+func (ab *AgoraBot) handleMessage(s *discordgo.Session, m *discordgo.MessageCreate) {
+	// Ignore messages from the bot itself
+	if m.Author.ID == s.State.User.ID {
+		return
+	}
+
+	// Check if message channel is in any hub
+	h, errHub := (*ab.Store).GetHubOfChannel(store.GetHubOfChannelParams{ChannelID: m.ChannelID})
+	if errHub != nil {
+		log.Printf("Error getting hub of channel: %v\n", errHub)
+		return
+	}
+
+	// Echo message to other channels in the hub
+	for _, targetChannelID := range h.Channels {
+		if targetChannelID != m.ChannelID {
+			// Create webhook message content
+			content := fmt.Sprintf("**%s** (from <#%s>):\n%s",
+				m.Author.Username,
+				m.ChannelID,
+				m.Content,
+			)
+
+			_, err := s.ChannelMessageSend(targetChannelID, content)
+			if err != nil {
+				log.Printf("Error sending message to channel %s: %v\n", targetChannelID, err)
+			}
+		}
+	}
 }
