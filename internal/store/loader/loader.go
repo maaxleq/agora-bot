@@ -14,6 +14,8 @@ func LoadStore(config config.Config) (*store.Storer, error) {
 	switch config.StoreType {
 	case "memory":
 		store = &stores.MemoryStore{}
+	case "mongo":
+		store = stores.NewMongoStorer()
 	default:
 		return nil, fmt.Errorf("store type %s not supported", config.StoreType)
 	}

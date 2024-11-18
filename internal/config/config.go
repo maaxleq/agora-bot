@@ -20,6 +20,7 @@ type Config struct {
 
 	// MongoDB configuration
 	MongoURI string `env:"AGORA_MONGO_URI" envDefault:"mongodb://localhost:27017/agora"`
+	MongoDB  string `env:"AGORA_MONGO_DB" envDefault:"agora"`
 }
 
 // NewFromEnv loads the configuration from environment variables or .env files.
