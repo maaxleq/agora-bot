@@ -12,6 +12,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/maaxleq/agora-bot/internal/config"
 	"github.com/maaxleq/agora-bot/internal/query"
+	"github.com/maaxleq/agora-bot/internal/query/queries"
 	"github.com/maaxleq/agora-bot/internal/store"
 	storeloader "github.com/maaxleq/agora-bot/internal/store/loader"
 )
@@ -97,7 +98,7 @@ func (ab *AgoraBot) handleMessage(s *discordgo.Session, m *discordgo.MessageCrea
 	}
 
 	// Check if message channel is in any hub
-	h, errHub := (*ab.Store).GetHubOfChannel(store.GetHubOfChannelParams{ChannelID: m.ChannelID})
+	h, errHub := queries.GetHubOfChannelQuery{}.Do(ab.GetQueryDeps(), store.GetHubOfChannelParams{ChannelID: m.ChannelID})
 	if errHub != nil {
 		log.Printf("Error getting hub of channel: %v\n", errHub)
 		return
@@ -136,7 +137,7 @@ func (ab *AgoraBot) handleReactionAdd(s *discordgo.Session, r *discordgo.Message
 	}
 
 	// Check if message channel is in any hub
-	h, errHub := (*ab.Store).GetHubOfChannel(store.GetHubOfChannelParams{ChannelID: r.ChannelID})
+	h, errHub := queries.GetHubOfChannelQuery{}.Do(ab.GetQueryDeps(), store.GetHubOfChannelParams{ChannelID: r.ChannelID})
 	if errHub != nil {
 		log.Printf("Error getting hub of channel: %v\n", errHub)
 		return
@@ -177,7 +178,7 @@ func (ab *AgoraBot) handleReactionRemove(s *discordgo.Session, r *discordgo.Mess
 	}
 
 	// Check if message channel is in any hub
-	h, errHub := (*ab.Store).GetHubOfChannel(store.GetHubOfChannelParams{ChannelID: r.ChannelID})
+	h, errHub := queries.GetHubOfChannelQuery{}.Do(ab.GetQueryDeps(), store.GetHubOfChannelParams{ChannelID: r.ChannelID})
 	if errHub != nil {
 		log.Printf("Error getting hub of channel: %v\n", errHub)
 		return
